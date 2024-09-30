@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Movie Recommender</h1>
+
+    <form action="/recommend" method="POST">
+        <label for="genre">Enter a movie genre (e.g., action, comedy, drama):</label><br><br>
+        <input type="text" id="genre" name="genre" placeholder="Enter genre..." required>
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    {% if genre %}
+        <h2>Recommended {{ genre }} movies:</h2>
+        <ul>
+            {% for movie in movies %}
+                <li>{{ movie }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</body>
+</html>

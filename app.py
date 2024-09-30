@@ -1,66 +1,26 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-import sqlite3
-import string
-import random
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
 
-# Database setup function
-def init_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS urls
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  original_url TEXT NOT NULL,
-                  short_url TEXT NOT NULL)''')
-    conn.commit()
-    conn.close()
+# Example movie database by genre (you can modify this with your own choices)
+movies_by_genre = {
+    "action": ["Mad Max: Fury Road", "Die Hard", "John Wick", "The Dark Knight"],
+    "comedy": ["The Hangover", "Superbad", "Step Brothers", "Groundhog Day"],
+    "drama": ["The Shawshank Redemption", "Forrest Gump", "The Godfather", "12 Angry Men"],
+    "horror": ["The Conjuring", "Get Out", "It", "A Nightmare on Elm Street"],
+    "sci-fi": ["Inception", "The Matrix", "Interstellar", "Blade Runner 2049"],
+    "romance": ["Pride and Prejudice", "La La Land", "The Notebook", "A Star is Born"],
+}
 
-# Helper function to generate short URL
-def generate_short_url():
-    characters = string.ascii_letters + string.digits
-    return ''.join(random.choice(characters) for _ in range(6))
-
-# Home page: URL shortening form
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        original_url = request.form['original_url']
-
-        if not original_url.startswith(('http://', 'https://')):
-            flash('Invalid URL. Please include http:// or https://', 'danger')
-            return redirect(url_for('index'))
-
-        short_url = generate_short_url()
-
-        # Save the original and short URL in the database
-        conn = sqlite3.connect('database.db')
-        c = conn.cursor()
-        c.execute('INSERT INTO urls (original_url, short_url) VALUES (?, ?)', (original_url, short_url))
-        conn.commit()
-        conn.close()
-
-        flash(f'Success! Your short URL is: {request.url_root}{short_url}', 'success')
-        return redirect(url_for('index'))
-
     return render_template('index.html')
 
-# Redirect from short URL to original URL
-@app.route('/<short_url>')
-def redirect_to_original(short_url):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('SELECT original_url FROM urls WHERE short_url = ?', (short_url,))
-    result = c.fetchone()
-    conn.close()
-
-    if result:
-        return redirect(result[0])
-    else:
-        flash('Invalid short URL', 'danger')
-        return redirect(url_for('index'))
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    genre = request.form['genre'].lower()  # Get genre input from user, make it lowercase
+    recommended_movies = movies_by_genre.get(genre, ["No movies found for this genre."])
+    return render_template('index.html', genre=genre.capitalize(), movies=recommended_movies)
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
