@@ -37,11 +37,33 @@
         li {
             padding: 5px 0;
         }
+        .logout {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .logout a {
+            text-decoration: none;
+            color: #007BFF;
+            font-size: 16px;
+        }
+        .logout a:hover {
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Logout Link (Top Left) -->
+    <div class="logout">
+        <form action="/logout" method="POST" style="display:inline;">
+            <a href="#" onclick="this.closest('form').submit(); return false;">Logout</a>
+        </form>
+    </div>
+
     <h1>Movie Recommender</h1>
+
+    <p>Welcome, {{ session['username'] }}!</p>
 
     <form action="/recommend" method="POST">
         <label for="genre">Enter a movie genre (e.g., action, comedy, drama):</label><br><br>
